@@ -1,0 +1,42 @@
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: litellm
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./litellm/config.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+
+  docling:
+    image: quay.io/docling-project/docling-serve
+    container_name: docling
+    restart: unless-stopped
+    environment:
+      - DOCLING_SERVE_ENABLE_UI=true
+      - UVICORN_WORKERS=1
+    ports:
+      - "5001:5001"
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    depends_on:
+      - litellm
+      - docling
+    env_file:
+      - .env
+    environment:
+      - OPENAI_API_BASE_URL=http://litellm:4000/v1
+      - OPENAI_API_KEY=${LITELLM_MASTER_KEY}
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+
+volumes:
+  open-webui-data:

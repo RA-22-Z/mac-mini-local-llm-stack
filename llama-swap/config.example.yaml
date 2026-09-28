@@ -1,0 +1,13 @@
+healthCheckTimeout: 120
+logLevel: info
+
+models:
+  mlx-community/Qwen3.5-4B-MLX-4bit:
+    cmd: mlx_lm.server --model mlx-community/Qwen3.5-4B-MLX-4bit --port ${PORT}
+    ttl: 600
+    checkEndpoint: /v1/models
+
+  mlx-community/gemma-4-e4b-it-4bit:
+    cmd: mlx_lm.server --model mlx-community/gemma-4-e4b-it-4bit --port ${PORT}
+    ttl: 600
+    checkEndpoint: /v1/models
